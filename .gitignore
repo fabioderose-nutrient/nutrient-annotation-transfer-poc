@@ -1,0 +1,24 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Python caches (sample generator)
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs, caches, OS and tool files
+*.log
+logs/
+.cache/
+.vite/
+.DS_Store
+.idea/
+.vscode/
+*.zip

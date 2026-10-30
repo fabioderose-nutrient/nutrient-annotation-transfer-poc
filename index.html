@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Annotation Transfer - Nutrient Web SDK</title>
+    <link rel="stylesheet" href="/src/style.css" />
+    <script src="https://cdn.cloud.pspdfkit.com/pspdfkit-web@1.10.0/nutrient-viewer.js"></script>
+  </head>
+  <body>
+    <header>
+      <div class="info-text">
+        <span>Annotation Transfer</span>
+        &nbsp;•&nbsp;
+        <button class="btn" id="matchAnnotationsBtn">Transfer Annotations</button>
+        &nbsp;•&nbsp;
+        <div class="upload-btn-wrapper">
+          <button class="btn btn-secondary">Open Document</button>
+          <input type="file" id="fileInput" accept=".pdf" />
+        </div>
+        &nbsp;•&nbsp;
+        <!-- loads the two sample documents shipped with the demo, handy for a quick test -->
+        <button class="btn btn-secondary" id="loadSamplesBtn">Load Samples</button>
+      </div>
+    </header>
+    <div id="app" class="App">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-state-icon" aria-hidden="true"><svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg></div>
+        <div class="empty-state-title">No document loaded</div>
+        <div class="empty-state-hint">Click <strong>Transfer Annotations</strong> to move the annotations of one version to the next,<br><strong>Load Samples</strong> to try it with the sample documents, or <strong>Open Document</strong> to view a PDF.</div>
+      </div>
+      <!-- single document view (Open Document) -->
+      <div id="singleViewer" class="single-viewer" style="display:none"></div>
+      <!-- before/after view shown after a transfer, with synced scrolling -->
+      <div id="compareView" class="compare-view" style="display:none">
+        <div class="compare-pane">
+          <div class="compare-label">Reference (before)</div>
+          <div id="viewerLeft" class="compare-viewer"></div>
+        </div>
+        <div class="compare-pane">
+          <div class="compare-label">Result (after)</div>
+          <div id="viewerRight" class="compare-viewer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- File selection modal -->
+    <div id="fileSelectModal" class="modal-overlay" style="display:none">
+      <div class="modal">
+        <h2 class="modal-title">Transfer Annotations</h2>
+        <p class="modal-subtitle">
+          Load the reference document (with annotations) and the target document
+          (where annotations will be transferred).
+        </p>
+        <div class="drop-zones">
+          <div class="drop-zone" id="dropZoneRef">
+            <div class="drop-zone-icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 14h6" stroke="#e0a800" stroke-width="3"/></svg></div>
+            <div class="drop-zone-label">Reference Document</div>
+            <div class="drop-zone-hint">Contains the annotations</div>
+            <div class="drop-zone-filename" id="refFilename">No file selected</div>
+            <input type="file" class="drop-zone-input" id="refFileInput" accept=".pdf" />
+          </div>
+          <div class="drop-zone-arrow">→</div>
+          <div class="drop-zone" id="dropZoneTarget">
+            <div class="drop-zone-icon" aria-hidden="true"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h5"/></svg></div>
+            <div class="drop-zone-label">Target Document</div>
+            <div class="drop-zone-hint">Receives the annotations</div>
+            <div class="drop-zone-filename" id="targetFilename">No file selected</div>
+            <input type="file" class="drop-zone-input" id="targetFileInput" accept=".pdf" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancelFileSelect">Cancel</button>
+          <button class="btn" id="analyzeBtn" disabled>Analyze Annotations</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Results modal -->
+    <div id="resultsModal" class="modal-overlay" style="display:none">
+      <div class="modal modal-wide">
+        <h2 class="modal-title">Annotation Match Results</h2>
+        <p class="modal-subtitle" id="resultsSubtitle"></p>
+        <div id="resultsTableContainer" class="results-table-container">
+          <table class="results-table" id="resultsTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Ref. Page</th>
+                <th>Anchor Text</th>
+                <th>Match</th>
+                <th>Target Page</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancelResults">Close</button>
+          <button class="btn" id="drawBtn">Draw Annotations in Target</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Processing overlay -->
+    <div id="processingOverlay" class="processing-overlay" style="display:none">
+      <div class="processing-box">
+        <div class="spinner"></div>
+        <div id="processingMessage">Analyzing documents…</div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
